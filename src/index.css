@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #710014;
+  --primary-hover: #7f0716;
+  --primary-active: #5f0510;
+  --primary-foreground: #ffffff;
+  
+  --background: oklch(0.98 0.006 260);
+  --card: oklch(0.995 0.002 260);
+  --card-foreground: oklch(0.18 0.020 32);
+  --surface: oklch(0.99 0.002 260);
+  --surface-raised: oklch(0.96 0.008 260);
+  
+  --border: oklch(0.90 0.008 260);
+  --border-subtle: oklch(0.93 0.005 260);
+  --foreground: oklch(0.18 0.020 32);
+  --muted-foreground: oklch(0.48 0.015 32);
+}
+
+@theme {
+  --font-serif: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif;
+  --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cinzel', 'Newsreader', Georgia, serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Custom scrollbars for archival panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1cbbf;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b5ad9e;
+}
+
+[data-source-page] span::selection {
+  background: rgba(59, 130, 246, 0.32);
+  color: transparent;
+}
+

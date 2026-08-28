@@ -1,0 +1,6 @@
+{
+  "name": "Tra cứu Sử liệu Việt Nam",
+  "description": "Phân tích nội dung lịch sử Việt Nam và kết nối các phát biểu với các trích đoạn nguồn sử liệu tương ứng.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
