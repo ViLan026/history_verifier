@@ -249,62 +249,6 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
         </div>
       </div>
 
-      {/* Retrieved Passage Excerpt */}
-      <div className="shrink-0 bg-[var(--surface-raised)] border border-[var(--border)] rounded-lg overflow-hidden shadow-2xs">
-        <div className="px-3 py-1 bg-gray-100/80 border-b border-[var(--border-subtle)] flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-bold font-serif text-[var(--primary)] text-[11px] uppercase tracking-wider">
-              Đoạn được truy xuất
-            </span>
-
-            {!highlightFoundOnPage && (
-              <span className="text-[11px] text-amber-700 italic">
-                Chưa xác định chính xác vị trí đoạn trích trên trang
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleCopyExcerpt}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-gray-700 hover:bg-[#7f0716] hover:text-white bg-white border border-gray-200 transition-colors"
-            >
-              {copiedExcerpt ? (
-                <>
-                  <Check className="w-3 h-3" />
-                  <span>Đã chép</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3 h-3" />
-                  <span>Sao chép</span>
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsRetrievedTextExpanded(!isRetrievedTextExpanded)}
-              className="p-1 rounded text-gray-500 hover:bg-[#7f0716] hover:text-white bg-white border border-gray-200 transition-colors"
-            >
-              {isRetrievedTextExpanded ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div
-          className={`p-2.5 bg-white border-l-3 border-[var(--primary)] text-xs sm:text-sm font-serif text-gray-900 leading-relaxed text-justify select-text ${
-            isRetrievedTextExpanded ? "max-h-48 overflow-y-auto" : "line-clamp-2 sm:line-clamp-3"
-          }`}
-        >
-          "{currentEvidence.text}"
-        </div>
-      </div>
 
       {/* Footnotes if any */}
       {footnoteEntries.length > 0 && (
