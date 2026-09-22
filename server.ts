@@ -95,64 +95,67 @@ async function startServer() {
     }
   });
 
-  app.get("/api/sources/:source_id/pdf", async (req, res) => {
+  app.post("/api/source-excerpt", async (req, res) => {
     try {
-      const sourceId = req.params.source_id?.trim();
+      const { source_id, pdf_pages, text } = req.body;
 
-      if (!sourceId) {
-        res.status(400).json({
-          error: "Thiếu mã nguồn sử liệu.",
-        });
+      if (
+        !source_id ||
+        !Array.isArray(pdf_pages) ||
+        pdf_pages.length === 0 ||
+        typeof text !== "string" ||
+        !text.trim()
+      ) {
+        res.status(400).json({ error: "Dữ liệu nguồn sử liệu không hợp lệ." });
         return;
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-      try {
-        const response = await fetch(
-          `${BACKEND_BASE_URL}/api/v1/sources/${encodeURIComponent(sourceId)}/pdf`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-            },
-            signal: controller.signal,
-          }
-        );
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          const errorText = await response.text().catch(() => "");
-
-          console.error(
-            `PDF source API error (${response.status}):`,
-            errorText
-          );
-
-          res.status(response.status).json({
-            error: `Không thể lấy PDF cho nguồn '${sourceId}'.`,
-          });
-
-          return;
+      const response = await fetch(
+        `${BACKEND_BASE_URL}/api/v1/sources/${encodeURIComponent(source_id)}/excerpt`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pdf_pages,
+            text,
+          }),
         }
+      );
 
-        res.json(await response.json());
-      } catch (err: any) {
-        clearTimeout(timeoutId);
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        console.error(`Excerpt API error (${response.status}):`, errorText);
 
-        if (err?.name === "AbortError") {
-          res.status(504).json({
-            error: "Quá thời gian tải thông tin PDF.",
-          });
-          return;
-        }
+        res.status(response.status).json({
+          error: "Không thể tạo trích đoạn PDF.",
+        });
 
-        throw err;
+        return;
       }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Cache-Control", "no-store");
+
+      for (const header of [
+        "x-excerpt-start-page",
+        "x-excerpt-end-page",
+        "x-target-excerpt-page",
+        "x-highlight-mode",
+      ]) {
+        const value = response.headers.get(header);
+
+        if (value) {
+          res.setHeader(header, value);
+        }
+      }
+
+      res.send(buffer);
     } catch (err) {
-      console.error("Proxy error in PDF source:", err);
+      console.error("Proxy error in /api/source-excerpt:", err);
 
       res.status(500).json({
         error: "Không thể kết nối tới dịch vụ PDF.",
