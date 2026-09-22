@@ -1,29 +1,19 @@
-import type { EvidenceViewResponse } from "../types";
+import type { PdfSourceResponse } from "../types";
 
-export async function getEvidenceView(
-  sourceId: string,
-  pages: number[],
-  text: string
-): Promise<EvidenceViewResponse> {
-  if (!sourceId) throw new Error("Không có mã nguồn sử liệu.");
-  if (!pages.length) throw new Error("Không có số trang sử liệu.");
-  if (!text.trim()) throw new Error("Không có nội dung sử liệu để đối chiếu.");
+export async function getPdfSource(sourceId: string): Promise<PdfSourceResponse> {
+  if (!sourceId.trim()) {
+    throw new Error("Không có mã nguồn sử liệu.");
+  }
 
-  const response = await fetch("/api/source-evidence-view", {
-    method: "POST",
+  const response = await fetch(`/api/sources/${encodeURIComponent(sourceId)}/pdf`, {
+    method: "GET",
     headers: {
-      "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify({
-      source_id: sourceId,
-      pages,
-      text,
-    }),
   });
 
   if (!response.ok) {
-    let message = `Không thể tải dữ liệu trang (${response.status})`;
+    let message = `Không thể tải PDF (${response.status})`;
 
     try {
       const data = await response.json();
@@ -35,8 +25,4 @@ export async function getEvidenceView(
   }
 
   return response.json();
-}
-
-export function getSourcePageImageUrl(sourceId: string, page: number): string {
-  return `/api/source-page-image?source_id=${encodeURIComponent(sourceId)}&page=${page}`;
 }

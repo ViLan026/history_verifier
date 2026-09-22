@@ -1,21 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
-  AlignLeft,
   AlertCircle,
-  BookMarked,
   BookOpen,
   Bookmark,
-  Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  Copy,
   Library,
   Search,
+  Focus
 } from "lucide-react";
 import { Claim, Evidence } from "../types";
-import { PdfViewer } from "./PdfViewer";
+import { PdfViewer, PdfViewerRef } from "./PdfViewer";
 
 interface SourceReaderProps {
   selectedClaim: Claim | null;
@@ -32,7 +27,8 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
   const [showFootnotes, setShowFootnotes] = useState<boolean>(false);
   const [isRetrievedTextExpanded, setIsRetrievedTextExpanded] = useState<boolean>(false);
   const [copiedExcerpt, setCopiedExcerpt] = useState<boolean>(false);
-  const [highlightFoundOnPage, setHighlightFoundOnPage] = useState<boolean>(true);
+  // const [highlightFoundOnPage, setHighlightFoundOnPage] = useState<boolean>(true);
+  const pdfViewerRef = useRef<PdfViewerRef>(null);
 
   const evidenceList = selectedClaim?.evidence || [];
   const hasEvidence = evidenceList.length > 0;
@@ -40,19 +36,19 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
     ? evidenceList[activeEvidenceIndex] || evidenceList[0]
     : null;
 
-  const resolveSourceId = (evidence: Evidence | null): string => {
-    if (!evidence) return "";
-    if (evidence.source_id?.trim()) return evidence.source_id.trim();
+  // const resolveSourceId = (evidence: Evidence | null): string => {
+  //   if (!evidence) return "";
+  //   if (evidence.source_id?.trim()) return evidence.source_id.trim();
 
-    const book = (evidence.book_name || "").toLowerCase();
+  //   const book = (evidence.book_name || "").toLowerCase();
 
-    if (book.includes("đại việt sử ký toàn thư") || book.includes("toàn thư")) return "dvsk";
-    if (book.includes("khâm định") || book.includes("cương mục")) return "kdvstgcm";
-    if (book.includes("vương triều trần")) return "vtt";
-    if (book.includes("việt sử toàn thư")) return "vstt";
+  //   if (book.includes("đại việt sử ký toàn thư") || book.includes("toàn thư")) return "dvsk";
+  //   if (book.includes("khâm định") || book.includes("cương mục")) return "kdvstgcm";
+  //   if (book.includes("vương triều trần")) return "vtt";
+  //   if (book.includes("việt sử toàn thư")) return "vstt";
 
-    return "";
-  };
+  //   return "";
+  // };
 
   const headerEntries = currentEvidence?.headers
     ? Object.entries(currentEvidence.headers).filter(
@@ -112,11 +108,6 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
         <h3 className="font-serif font-bold text-lg text-[var(--card-foreground)]">
           NGUỒN SỬ LIỆU
         </h3>
-
-        <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-md mt-2 leading-relaxed">
-          Nhấp vào đoạn văn bản được tô sáng ở cột bên trái để mở nguồn sử liệu tương ứng.
-        </p>
-
         <div className="mt-6 flex items-center gap-2 text-xs text-gray-500 italic bg-gray-50 px-3.5 py-1.5 rounded-full border border-gray-200">
           <Search className="w-3.5 h-3.5 text-[var(--primary)]" />
           <span>Tự động mở trang và đối chiếu đoạn được truy xuất</span>
@@ -166,7 +157,8 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
     );
   }
 
-  const sourceId = resolveSourceId(currentEvidence);
+  // const sourceId = resolveSourceId(currentEvidence);
+  const sourceId = currentEvidence.source_id?.trim() || "";
 
   return (
     <div className="bg-white border border-[var(--border)] rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col h-full min-h-0 overflow-hidden space-y-2.5">
@@ -201,11 +193,17 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+
             {formattedPages && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-gray-100 text-gray-800 text-xs font-serif font-medium border border-gray-200">
-                <BookMarked className="w-3.5 h-3.5 text-[var(--primary)]" />
-                <span>Trang {formattedPages}</span>
-              </span>
+              <button
+                type="button"
+                onClick={() => pdfViewerRef.current?.scrollToTargetHighlight(true)}
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium text-[var(--primary)] bg-red-50 hover:bg-red-100 border border-red-200/80 rounded transition-colors"
+                title="Cuộn tới vị trí đoạn trích dẫn được highlight"
+              >
+                <Focus className="w-3 h-3" />
+                <span>Vị trí trích dẫn</span>
+              </button>
             )}
 
             {evidenceList.length > 1 && (
@@ -250,51 +248,14 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
       </div>
 
 
-      {/* Footnotes if any */}
-      {footnoteEntries.length > 0 && (
-        <div className="shrink-0 bg-[var(--surface-raised)] border border-[var(--border)] rounded-lg overflow-hidden text-xs">
-          <button
-            type="button"
-            onClick={() => setShowFootnotes(!showFootnotes)}
-            className="w-full px-3 py-1 flex items-center justify-between text-left font-serif font-semibold text-gray-700 uppercase tracking-wide hover:bg-gray-100 transition-colors"
-          >
-            <div className="flex items-center gap-1.5">
-              <AlignLeft className="w-3.5 h-3.5 text-[var(--primary)]" />
-              <span>Xem chú thích thư tịch ({footnoteEntries.length})</span>
-            </div>
-
-            {showFootnotes ? (
-              <ChevronUp className="w-3.5 h-3.5" />
-            ) : (
-              <ChevronDown className="w-3.5 h-3.5" />
-            )}
-          </button>
-
-          {showFootnotes && (
-            <div className="p-2.5 bg-white border-t border-[var(--border-subtle)] space-y-1 max-h-32 overflow-y-auto">
-              {footnoteEntries.map(([key, note]) => (
-                <div key={key} className="flex items-start gap-1.5 text-xs text-gray-700">
-                  <span className="font-semibold text-[var(--primary)] min-w-[32px]">
-                    [{key}]
-                  </span>
-                  <span className="leading-relaxed">{note}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Embedded PDF Source Viewer strictly contained and scrollable */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {sourceId ? (
           <PdfViewer
             sourceId={sourceId}
-            bookTitle={currentEvidence.book_name}
-            initialPage={currentEvidence.pages[0] || 1}
+            bookTitle={currentEvidence.book_name || undefined}
+            pdfPages={currentEvidence.pdf_pages}
             highlightText={currentEvidence.text}
-            highlightPages={currentEvidence.pages}
-            onHighlightStatusChange={setHighlightFoundOnPage}
           />
         ) : (
           <div className="flex-1 min-h-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-xs text-gray-500">

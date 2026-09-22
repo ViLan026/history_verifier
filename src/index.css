@@ -49,8 +49,75 @@ body {
   background: #b5ad9e;
 }
 
+
+
+
+
+.pdf-page-shell {
+  position: relative;
+  flex: 0 0 auto;
+  background: white;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.08);
+}
+
+.pdf-page-shell canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.pdf-page-shell .textLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.pdf-page-shell .textLayer span {
+  cursor: text;
+}
+
+.pdf-page-shell .textLayer span.evidence-highlight {
+  background: rgba(250, 204, 21, 0.52);
+  border-radius: 2px;
+}
+
+.pdf-page-shell .textLayer span::selection {
+  background: rgba(59, 130, 246, 0.35);
+}
+
+.pdf-page-label {
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  right: 8px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.68);
+  color: white;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
 [data-source-page] span::selection {
   background: rgba(59, 130, 246, 0.32);
   color: transparent;
 }
-
+ */

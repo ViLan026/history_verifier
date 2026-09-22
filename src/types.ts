@@ -1,13 +1,14 @@
 export interface Evidence {
-  chunk_id: string;
-  score: number;
-  book_name: string;
-  source_id?: string;
+  chunk_id?: string | null;
+  score?: number | null;
+  book_name?: string | null;
+  source_id?: string | null;
   pages: number[];
+  pdf_pages: number[];
   text: string;
   headers?: Record<string, string> | null;
-  footnotes?: Record<string, string> | null;
-  token_count?: number;
+  footnotes?: Record<string, unknown> | null;
+  token_count?: number | null;
 }
 
 export interface Claim {
@@ -51,40 +52,4 @@ export interface SampleParagraph {
   era: string;
   content: string;
   sourceHint: string;
-}
-
-
-export interface SourceWord {
-  text: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  block: number;
-  line: number;
-  word: number;
-}
-
-export interface HighlightRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface SourcePageView {
-  page: number;
-  width: number;
-  height: number;
-  words: SourceWord[];
-  highlights: HighlightRect[];
-}
-
-export interface EvidenceViewResponse {
-  source_id: string;
-  source_pages: number[];
-  pdf_pages: number[];
-  display_pages: number[];
-  pages: SourcePageView[];
-  highlight_found: boolean;
 }

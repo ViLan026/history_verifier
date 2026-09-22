@@ -38,23 +38,7 @@ export const ResearchSession: React.FC<ResearchSessionProps> = ({
   return (
     <div className="bg-white border border-[var(--border)] rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col h-full min-h-0 overflow-hidden">
       {/* Session Header */}
-      <div className="shrink-0 flex items-center justify-between pb-2.5 mb-2 border-b border-[var(--border-subtle)]">
-        <h3 className="font-serif font-bold text-base text-[var(--card-foreground)] uppercase tracking-wide">
-          Phiên tra cứu
-        </h3>
-
-        {entries.length > 0 && (
-          <button
-            type="button"
-            onClick={onClearSession}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-gray-700 bg-gray-100 hover:bg-[#7f0716] hover:text-white active:bg-[#5f0510] border border-gray-200 transition-colors cursor-pointer disabled:opacity-50"
-            title="Làm mới toàn bộ phiên tra cứu"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Làm mới phiên</span>
-          </button>
-        )}
+      <div className="shrink-0 flex items-center justify-between pb-1.5 mb-2 border-[var(--border-subtle)]">
       </div>
 
       {/* Entries List (Scrollable Chronological Session) */}
@@ -78,7 +62,6 @@ export const ResearchSession: React.FC<ResearchSessionProps> = ({
                 isEntrySelected={isEntrySelected}
                 selectedClaimId={isEntrySelected ? selectedClaimId : null}
                 onSelectClaim={(claimId) => onSelectClaim(entry.id, claimId)}
-                onRemoveEntry={onRemoveEntry}
               />
             );
           })
