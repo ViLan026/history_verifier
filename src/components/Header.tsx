@@ -53,15 +53,6 @@ export const Header: React.FC = () => {
             </div>
 
             <div className="mt-4 space-y-3.5 text-sm text-gray-700 leading-relaxed">
-              <div className="p-3 bg-red-50/70 rounded-lg border border-red-100">
-                <p className="font-semibold text-xs uppercase tracking-wider mb-1 text-[var(--primary)]">
-                  Không phải công cụ kiểm tra đúng/sai (Fact-checking)
-                </p>
-                <p className="text-xs text-gray-600 leading-normal">
-                  Hệ thống không phân định phát biểu là “Đúng”, “Sai”, “Đã xác minh” hay “Bị bác bỏ”.
-                </p>
-              </div>
-
               <p className="text-xs sm:text-sm text-gray-700">
                 Mục đích cốt lõi là <strong>rút ngắn khoảng cách giữa người đọc và văn bản sử liệu gốc</strong>:
               </p>
