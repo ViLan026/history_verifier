@@ -167,7 +167,7 @@ export default function App() {
 
           {/* Right Column: Historical Source Reader (60-62% desktop) */}
           <section
-            aria-label="Nguồn sử liệu và thư tịch cổ"
+            aria-label="Nguồn sử liệu"
             className="w-full lg:w-[60%] xl:w-[62%] h-full min-h-0 flex flex-col overflow-hidden"
           >
             <SourceReader

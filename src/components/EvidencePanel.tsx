@@ -181,7 +181,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
 
       {/* Panel Footer */}
       <div className="mt-3 pt-2.5 border-t border-[#EAE1CF] text-[11px] text-[#7A7064] text-center">
-        Trích đoạn từ chính sử và thư tịch cổ phục vụ nghiên cứu & tra cứu học thuật
+        Trích đoạn từ chính sử phục vụ nghiên cứu & tra cứu học thuật
       </div>
     </div>
   );

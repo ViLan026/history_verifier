@@ -62,7 +62,7 @@ export const LoadingState: React.FC = () => {
       </div>
 
       <p className="text-[11px] text-[#918779] mt-6 italic">
-        Quá trình phân tích ngữ nghĩa và tra cứu thư tịch cổ thường mất từ 5 đến 15 giây...
+        Quá trình phân tích ngữ nghĩa và tra cứu thường mất từ 5 đến 15 giây...
       </p>
     </div>
   );

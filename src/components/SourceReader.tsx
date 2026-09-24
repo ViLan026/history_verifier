@@ -172,7 +172,7 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
               </div>
 
               <h3 className="text-sm sm:text-base font-bold font-serif text-[var(--card-foreground)] tracking-wide uppercase">
-                {currentEvidence.book_name || "Thư tịch cổ"}
+                {currentEvidence.book_name || "Nguồn chính sử"}
               </h3>
             </div>
 
@@ -252,6 +252,7 @@ export const SourceReader: React.FC<SourceReaderProps> = ({
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {sourceId ? (
           <PdfViewer
+            ref={pdfViewerRef}
             sourceId={sourceId}
             bookTitle={currentEvidence.book_name || undefined}
             pdfPages={currentEvidence.pdf_pages}

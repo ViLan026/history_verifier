@@ -49,7 +49,7 @@ export const ResearchSession: React.FC<ResearchSessionProps> = ({
               Bắt đầu phiên nghiên cứu sử liệu
             </h4>
             <p className="text-xs text-[var(--muted-foreground)] max-w-sm mx-auto leading-relaxed">
-              Nhập hoặc dán các đoạn văn bản lịch sử ở bên dưới. Các phát biểu sẽ được đánh dấu trực tiếp để bạn đối chiếu với thư tịch cổ.
+              Nhập hoặc dán các đoạn văn bản lịch sử ở bên dưới. Các phát biểu sẽ được đánh dấu trực tiếp để bạn đối chiếu với chính sử.
             </p>
           </div>
         ) : (

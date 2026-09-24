@@ -40,7 +40,7 @@ export const ResearchEntryCard: React.FC<ResearchEntryCardProps> = ({
             <span>Đang phân tích nội dung và tìm nguồn sử liệu...</span>
           </div>
           <p className="text-[11px] text-[var(--muted-foreground)] italic">
-            Đang trích xuất phát biểu và đối chiếu với thư tịch cổ
+            Đang trích xuất phát biểu và đối chiếu với nguồn chính sử
           </p>
         </div>
       ) : entry.status === "error" ? (
