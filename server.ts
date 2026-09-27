@@ -4,11 +4,9 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 
-const BACKEND_BASE_URL = (
-  process.env.BACKEND_BASE_URL
-).replace(/\/+$/, "");
+const BACKEND_BASE_URL = (process.env.BACKEND_BASE_URL).replace(/\/+$/, "");
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = 3000;
 
 async function startServer() {
   const app = express();
