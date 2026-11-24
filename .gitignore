@@ -6,3 +6,5 @@ coverage/
 *.log
 .env*
 !.env.example
+# Cloudflare Wrangler local state
+.wrangler/
