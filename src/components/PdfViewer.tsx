@@ -37,13 +37,7 @@ interface TextFragment {
 }
 
 function normalizeForMatch(text: string): string {
-  return text
-    .normalize("NFC")
-    .toLocaleLowerCase("vi-VN")
-    .replace(/\u00ad/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return text.normalize("NFC").toLocaleLowerCase("vi-VN").replace(/\u00ad/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
 }
 
 function highlightEvidence(
@@ -75,10 +69,7 @@ function highlightEvidence(
 
     searchableText += normalized;
 
-    ranges.push({
-      fragment,
-      start,
-      end: searchableText.length,
+    ranges.push({fragment, start, end: searchableText.length,
     });
   }
 
@@ -104,9 +95,7 @@ function highlightEvidence(
       let found = false;
 
       for (let start = 0; start <= words.length - length; start++) {
-        const fragment = words
-          .slice(start, start + length)
-          .join(" ");
+        const fragment = words.slice(start, start + length).join(" ");
 
         const position = searchableText.indexOf(fragment);
 
@@ -131,15 +120,11 @@ function highlightEvidence(
   let firstMatchedElement: HTMLElement | null = null;
 
   for (const range of ranges) {
-    const overlaps =
-      range.end > matchStart &&
-      range.start < matchEnd;
+    const overlaps = range.end > matchStart && range.start < matchEnd;
 
     if (!overlaps) continue;
 
-    range.fragment.element.classList.add(
-      "evidence-highlight"
-    );
+    range.fragment.element.classList.add("evidence-highlight");
 
     if (!firstMatchedElement) {
       firstMatchedElement = range.fragment.element;
@@ -149,38 +134,23 @@ function highlightEvidence(
   return firstMatchedElement;
 }
 
-export const PdfViewer = forwardRef<
-  PdfViewerRef,
-  PdfViewerProps
->(
-  (
-    {
-      sourceId,
-      bookTitle,
-      pdfPages,
-      highlightText,
-    },
+export const PdfViewer = forwardRef< PdfViewerRef, PdfViewerProps>((
+    { sourceId, bookTitle, pdfPages, highlightText,},
     ref
   ) => {
     const viewerRef = useRef<HTMLDivElement>(null);
 
-    const highlightRef =
-      useRef<HTMLElement | null>(null);
+    const highlightRef = useRef<HTMLElement | null>(null);
 
-    const targetPageRef =
-      useRef<HTMLElement | null>(null);
+    const targetPageRef = useRef<HTMLElement | null>(null);
 
-    const [viewerWidth, setViewerWidth] =
-      useState(0);
+    const [viewerWidth, setViewerWidth] = useState(0);
 
-    const [isLoading, setIsLoading] =
-      useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const [error, setError] =
-      useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const [highlightMode, setHighlightMode] =
-      useState("none");
+    const [highlightMode, setHighlightMode] = useState("none");
 
     /*
      * Nút "Vị trí trích dẫn" trong SourceReader
@@ -189,10 +159,7 @@ export const PdfViewer = forwardRef<
     useImperativeHandle(ref, () => ({
       scrollToTargetHighlight: () => {
         if (highlightRef.current) {
-          highlightRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
+          highlightRef.current.scrollIntoView({ behavior: "smooth", block: "center", });
 
           return;
         }
@@ -201,8 +168,7 @@ export const PdfViewer = forwardRef<
          * Nếu không tìm được text chính xác,
          * ít nhất vẫn cuộn tới đúng trang.
          */
-        targetPageRef.current?.scrollIntoView({
-          behavior: "smooth",
+        targetPageRef.current?.scrollIntoView({ behavior: "smooth",
           block: "start",
         });
       },
@@ -212,7 +178,7 @@ export const PdfViewer = forwardRef<
      * Theo dõi chiều rộng khu vực PDF
      * để scale trang theo desktop/mobile.
      */
-    useEffect(() => {
+    useEffect(() => { 
       const container = viewerRef.current;
 
       if (!container) return;
@@ -236,24 +202,18 @@ export const PdfViewer = forwardRef<
       };
     }, []);
 
+    const pdfPagesKey = pdfPages.join(",");
+
     useEffect(() => {
-      if (
-        !sourceId ||
-        !pdfPages?.length ||
-        !highlightText.trim() ||
-        !viewerWidth
-      ) {
+      if (!sourceId ||!pdfPages?.length ||!highlightText.trim() ||!viewerWidth) {
         return;
       }
 
       let cancelled = false;
 
-      let loadingTask:
-        | ReturnType<typeof pdfjsLib.getDocument>
-        | null = null;
+      let loadingTask: | ReturnType<typeof pdfjsLib.getDocument> | null = null;
 
-      const load = async () => {
-        const container = viewerRef.current;
+      const load = async () => { const container = viewerRef.current;
 
         if (!container) return;
 
@@ -271,11 +231,7 @@ export const PdfViewer = forwardRef<
            * Backend hiện tại vẫn giữ nguyên:
            * trả về excerpt PDF dưới dạng Blob.
            */
-          const result = await getPdfExcerpt(
-            sourceId,
-            pdfPages,
-            highlightText
-          );
+          const result = await getPdfExcerpt( sourceId, pdfPages, highlightText);
 
           if (cancelled) return;
 
@@ -287,20 +243,15 @@ export const PdfViewer = forwardRef<
            * Chuyển Blob -> ArrayBuffer -> Uint8Array
            * rồi đưa trực tiếp cho PDF.js.
            */
-          const arrayBuffer =
-            await result.blob.arrayBuffer();
+          const arrayBuffer = await result.blob.arrayBuffer();
 
           if (cancelled) return;
 
-          const pdfData =
-            new Uint8Array(arrayBuffer);
+          const pdfData = new Uint8Array(arrayBuffer);
 
-          loadingTask = pdfjsLib.getDocument({
-            data: pdfData,
-          });
+          loadingTask = pdfjsLib.getDocument({ data: pdfData,});
 
-          const pdf =
-            await loadingTask.promise;
+          const pdf = await loadingTask.promise;
 
           if (cancelled) return;
 
@@ -310,129 +261,77 @@ export const PdfViewer = forwardRef<
            * Backend chỉ trả excerpt khoảng 7 trang,
            * nên render toàn bộ excerpt.
            */
-          for (
-            let pageNumber = 1;
-            pageNumber <= pdf.numPages;
-            pageNumber++
-          ) {
+          for ( let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
             if (cancelled) return;
 
-            const page =
-              await pdf.getPage(pageNumber);
+            const page = await pdf.getPage(pageNumber);
 
-            const baseViewport =
-              page.getViewport({
-                scale: 1,
-              });
+            const baseViewport = page.getViewport({ scale: 1, });
 
             /*
              * Chừa khoảng padding trong viewer.
              */
-            const availableWidth = Math.max(
-              viewerWidth - 24,
-              240
-            );
+            // const availableWidth = Math.max( viewerWidth - 24, 240 );
+            const availableWidth = Math.max((container.clientWidth || 720) - 24, 240);
 
             /*
              * Không phóng quá lớn trên desktop.
              */
-            const scale = Math.min(
-              1.5,
-              availableWidth /
-                baseViewport.width
-            );
+            const scale = Math.min( 1.5, availableWidth / baseViewport.width);
 
-            const viewport =
-              page.getViewport({
-                scale,
-              });
+            const viewport = page.getViewport({ scale, });
 
             /*
              * Container của một trang PDF.
              */
-            const pageWrapper =
-              document.createElement("section");
+            const pageWrapper = document.createElement("section");
 
-            pageWrapper.className =
-              "pdf-page-shell";
+            pageWrapper.className = "pdf-page-shell";
 
-            pageWrapper.dataset.pdfPage =
-              String(pageNumber);
+            pageWrapper.dataset.pdfPage = String(pageNumber);
 
-            pageWrapper.style.width =
-              `${viewport.width}px`;
+            pageWrapper.style.width = `${viewport.width}px`;
 
-            pageWrapper.style.height =
-              `${viewport.height}px`;
+            pageWrapper.style.height = `${viewport.height}px`;
 
             /*
              * Ghi nhớ đúng trang mà backend
              * xác định là target page.
              */
-            if (
-              pageNumber === result.targetPage
-            ) {
-              targetPageRef.current =
-                pageWrapper;
+            if (  pageNumber === result.targetPage ) {
+              targetPageRef.current = pageWrapper;
             }
 
             /*
              * Canvas = hình ảnh thật của PDF.
              */
-            const canvas =
-              document.createElement("canvas");
+            const canvas = document.createElement("canvas");
 
-            const context =
-              canvas.getContext("2d");
+            const context = canvas.getContext("2d");
 
             if (!context) {
-              throw new Error(
-                "Không thể khởi tạo canvas PDF."
-              );
+              throw new Error( "Không thể khởi tạo canvas PDF.");
             }
 
             /*
              * Giới hạn DPR để mobile không tạo
              * canvas quá lớn gây tốn RAM.
              */
-            const outputScale = Math.min(
-              window.devicePixelRatio || 1,
-              1.5
-            );
+            const outputScale = Math.min(  window.devicePixelRatio || 1,  1.5)
+            
+            canvas.width = Math.floor(  viewport.width * outputScale)
+            
+            canvas.height = Math.floor(  viewport.height * outputScale);
 
-            canvas.width = Math.floor(
-              viewport.width * outputScale
-            );
+            canvas.style.width = `${viewport.width}px`;
 
-            canvas.height = Math.floor(
-              viewport.height * outputScale
-            );
-
-            canvas.style.width =
-              `${viewport.width}px`;
-
-            canvas.style.height =
-              `${viewport.height}px`;
+            canvas.style.height = `${viewport.height}px`;
 
             pageWrapper.appendChild(canvas);
 
-            const transform =
-              outputScale === 1
-                ? undefined
-                : [
-                    outputScale,
-                    0,
-                    0,
-                    outputScale,
-                    0,
-                    0,
-                  ];
+            const transform = outputScale === 1 ? undefined : [ outputScale,  0,  0,  outputScale,  0,  0,];
 
-            await page.render({
-              canvasContext: context,
-              viewport,
-              transform,
-            }).promise;
+            await page.render({ canvasContext: context, viewport, transform,}).promise;
 
             if (cancelled) return;
 
@@ -444,33 +343,23 @@ export const PdfViewer = forwardRef<
              * - copy chữ
              * - highlight evidence
              */
-            const textContent =
-              await page.getTextContent();
+            const textContent =  await page.getTextContent();
 
-            const textLayer =
-              document.createElement("div");
+            const textLayer = document.createElement("div");
 
             textLayer.className = "textLayer";
 
-            textLayer.style.width =
-              `${viewport.width}px`;
+            textLayer.style.width = `${viewport.width}px`;
 
-            textLayer.style.height =
-              `${viewport.height}px`;
+            textLayer.style.height = `${viewport.height}px`;
 
-            textLayer.style.setProperty(
-              "--scale-factor",
-              String(viewport.scale)
-            );
+            textLayer.style.setProperty( "--scale-factor", String(viewport.scale));
 
-            pageWrapper.appendChild(
-              textLayer
-            );
+            pageWrapper.appendChild(  textLayer);
 
             const textDivs: HTMLElement[] = [];
 
-            const textLayerTask =
-              pdfjsLib.renderTextLayer({
+            const textLayerTask = pdfjsLib.renderTextLayer({
                 textContentSource:
                   textContent,
                 container: textLayer,
@@ -482,39 +371,23 @@ export const PdfViewer = forwardRef<
 
             if (cancelled) return;
 
-            const textItems =
-              textContent.items.filter(
-                (
-                  item
-                ): item is typeof item & {
+            const textItems = textContent.items.filter(
+                ( item ): item is typeof item & {   
                   str: string;
                 } =>
-                  "str" in item &&
-                  typeof item.str ===
-                    "string"
+                  "str" in item &&  typeof item.str === "string"
               );
 
-            const count = Math.min(
-              textItems.length,
-              textDivs.length
-            );
+            const count = Math.min(  textItems.length,  textDivs.length);
 
-            for (
-              let index = 0;
-              index < count;
-              index++
-            ) {
+            for (   let index = 0;   index < count;   index++ ) {
               allFragments.push({
-                element:
-                  textDivs[index],
-                text:
-                  textItems[index].str,
+                element: textDivs[index],
+                text: textItems[index].str,
               });
             }
 
-            container.appendChild(
-              pageWrapper
-            );
+            container.appendChild(  pageWrapper);
           }
 
           if (cancelled) return;
@@ -522,14 +395,9 @@ export const PdfViewer = forwardRef<
           /*
            * Tìm evidence trong text layer.
            */
-          const firstHighlight =
-            highlightEvidence(
-              allFragments,
-              highlightText
-            );
+          const firstHighlight = highlightEvidence(   allFragments,   highlightText );
 
-          highlightRef.current =
-            firstHighlight;
+          highlightRef.current = firstHighlight;
 
           /*
            * Khi load lần đầu:
@@ -556,15 +424,9 @@ export const PdfViewer = forwardRef<
         } catch (err: any) {
           if (cancelled) return;
 
-          console.error(
-            "PDF viewer failed:",
-            err
-          );
+          console.error(  "PDF viewer failed:",  err);
 
-          setError(
-            err?.message ||
-              "Không thể tải hoặc hiển thị tệp PDF."
-          );
+          setError(  err?.message ||    "Không thể tải hoặc hiển thị tệp PDF.");
         } finally {
           if (!cancelled) {
             setIsLoading(false);
@@ -581,12 +443,7 @@ export const PdfViewer = forwardRef<
           loadingTask.destroy();
         }
       };
-    }, [
-      sourceId,
-      pdfPages,
-      highlightText,
-      viewerWidth,
-    ]);
+    }, [ sourceId, pdfPagesKey, highlightText,]);
 
     return (
       <div className="flex-1 min-h-0 flex flex-col border border-gray-200 rounded-xl overflow-hidden bg-gray-100">
