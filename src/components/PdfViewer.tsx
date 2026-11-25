@@ -205,9 +205,17 @@ export const PdfViewer = forwardRef< PdfViewerRef, PdfViewerProps>((
     const pdfPagesKey = pdfPages.join(",");
 
     useEffect(() => {
-      if (!sourceId ||!pdfPages?.length ||!highlightText.trim() ||!viewerWidth) {
-        return;
-      }
+      console.log("PDF effect:", {
+        sourceId,
+        pdfPages,
+        highlightText: highlightText?.length,
+        viewerWidth,
+        containerWidth: viewerRef.current?.clientWidth,
+      });
+      // if (!sourceId ||!pdfPages?.length ||!highlightText.trim() ||!viewerWidth) {
+      //   return;
+      // }
+      if (!sourceId || !pdfPages?.length || !highlightText.trim()) return;
 
       let cancelled = false;
 
