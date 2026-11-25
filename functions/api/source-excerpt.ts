@@ -1,6 +1,9 @@
+interface KVNamespaceLike {
+  get(key: string): Promise<string | null>;
+}
 
 interface Env {
-  BACKEND_BASE_URL: string;
+  BACKEND_CONFIG: KVNamespaceLike;
 }
 
 interface Context {
@@ -15,8 +18,13 @@ function jsonResponse(data: unknown, status = 200): Response {
   });
 }
 
+async function getBackendUrl(env: Env): Promise<string | null> {
+  const url = await env.BACKEND_CONFIG.get("BACKEND_TUNNEL_URL");
+  return url?.replace(/\/+$/, "") || null;
+}
+
 export async function onRequestPost({ request, env }: Context): Promise<Response> {
-  const backendUrl = env.BACKEND_BASE_URL?.replace(/\/+$/, "");
+  const backendUrl = await getBackendUrl(env);
 
   if (!backendUrl) {
     return jsonResponse({ error: "Backend chưa được cấu hình." }, 500);
@@ -39,7 +47,10 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
       typeof text !== "string" ||
       !text.trim()
     ) {
-      return jsonResponse({ error: "Dữ liệu nguồn sử liệu không hợp lệ." }, 400);
+      return jsonResponse(
+        { error: "Dữ liệu nguồn sử liệu không hợp lệ." },
+        400
+      );
     }
 
     const response = await fetch(
@@ -54,11 +65,16 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
       console.error(`Excerpt API error (${response.status}):`, errorText);
-      return jsonResponse({ error: "Không thể tạo trích đoạn PDF." }, response.status);
+
+      return jsonResponse(
+        { error: "Không thể tạo trích đoạn PDF." },
+        response.status
+      );
     }
 
     const headers = new Headers({
-      "Content-Type": response.headers.get("Content-Type") || "application/pdf",
+      "Content-Type":
+        response.headers.get("Content-Type") || "application/pdf",
       "Cache-Control": "no-store",
     });
 
@@ -80,6 +96,10 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
     });
   } catch (error) {
     console.error("PDF proxy error:", error);
-    return jsonResponse({ error: "Không thể kết nối tới dịch vụ PDF." }, 502);
+
+    return jsonResponse(
+      { error: "Không thể kết nối tới dịch vụ PDF." },
+      502
+    );
   }
 }

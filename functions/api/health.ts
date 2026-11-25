@@ -1,12 +1,17 @@
-
-interface Env {
-  BACKEND_BASE_URL: string;
+interface KVNamespaceLike {
+  get(key: string): Promise<string | null>;
 }
 
-export function onRequestGet({ env }: { env: Env }): Response {
+interface Env {
+  BACKEND_CONFIG: KVNamespaceLike;
+}
+
+export async function onRequestGet({ env }: { env: Env }): Promise<Response> {
+  const backendUrl = await env.BACKEND_CONFIG.get("BACKEND_TUNNEL_URL");
+
   return Response.json({
     status: "ok",
-    backendConfigured: Boolean(env.BACKEND_BASE_URL),
+    backendConfigured: Boolean(backendUrl),
     timestamp: new Date().toISOString(),
   });
 }

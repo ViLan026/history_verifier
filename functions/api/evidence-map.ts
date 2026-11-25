@@ -1,6 +1,9 @@
+interface KVNamespaceLike {
+  get(key: string): Promise<string | null>;
+}
 
 interface Env {
-  BACKEND_BASE_URL: string;
+  BACKEND_CONFIG: KVNamespaceLike;
 }
 
 interface Context {
@@ -15,8 +18,13 @@ function jsonResponse(data: unknown, status = 200): Response {
   });
 }
 
+async function getBackendUrl(env: Env): Promise<string | null> {
+  const url = await env.BACKEND_CONFIG.get("BACKEND_TUNNEL_URL");
+  return url?.replace(/\/+$/, "") || null;
+}
+
 export async function onRequestPost({ request, env }: Context): Promise<Response> {
-  const backendUrl = env.BACKEND_BASE_URL?.replace(/\/+$/, "");
+  const backendUrl = await getBackendUrl(env);
 
   if (!backendUrl) {
     return jsonResponse({ error: "Backend chưa được cấu hình." }, 500);
@@ -33,7 +41,10 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
   const content = body.content;
 
   if (typeof content !== "string" || content.trim().length < 5) {
-    return jsonResponse({ error: "Vui lòng nhập đoạn văn có ít nhất 5 ký tự." }, 400);
+    return jsonResponse(
+      { error: "Vui lòng nhập đoạn văn có ít nhất 5 ký tự." },
+      400
+    );
   }
 
   const controller = new AbortController();
@@ -55,7 +66,12 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
       console.error(`Evidence API error (${response.status}):`, errorText);
 
       return jsonResponse(
-        { error: response.status >= 500 ? "Dịch vụ tìm nguồn sử liệu đang gặp sự cố." : "Yêu cầu tìm nguồn sử liệu không hợp lệ." },
+        {
+          error:
+            response.status >= 500
+              ? "Dịch vụ tìm nguồn sử liệu đang gặp sự cố."
+              : "Yêu cầu tìm nguồn sử liệu không hợp lệ.",
+        },
         response.status >= 500 ? 502 : response.status
       );
     }
@@ -63,17 +79,25 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
     return new Response(response.body, {
       status: response.status,
       headers: {
-        "Content-Type": response.headers.get("Content-Type") || "application/json",
+        "Content-Type":
+          response.headers.get("Content-Type") || "application/json",
         "Cache-Control": "no-store",
       },
     });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      return jsonResponse({ error: "Quá thời gian phân tích nội dung." }, 504);
+      return jsonResponse(
+        { error: "Quá thời gian phân tích nội dung." },
+        504
+      );
     }
 
     console.error("Evidence proxy error:", error);
-    return jsonResponse({ error: "Không thể kết nối tới dịch vụ tìm nguồn sử liệu." }, 502);
+
+    return jsonResponse(
+      { error: "Không thể kết nối tới dịch vụ tìm nguồn sử liệu." },
+      502
+    );
   } finally {
     clearTimeout(timeoutId);
   }
