@@ -4,7 +4,13 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 
-const BACKEND_BASE_URL = (process.env.BACKEND_BASE_URL).replace(/\/+$/, "");
+const backendBaseUrl = process.env.BACKEND_BASE_URL?.replace(/\/+$/, "");
+
+if (!backendBaseUrl) {
+  throw new Error("Missing BACKEND_BASE_URL in environment variables.");
+}
+
+const BACKEND_BASE_URL = backendBaseUrl;
 
 const PORT = 3000;
 
@@ -16,7 +22,7 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
-      backend: BACKEND_BASE_URL,
+      backendConfigured: Boolean(BACKEND_BASE_URL),
       timestamp: new Date().toISOString(),
     });
   });
